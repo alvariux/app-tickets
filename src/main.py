@@ -151,7 +151,51 @@ def main(page: ft.Page):
     btn_recortar = ft.Row(controls=[btn_recortar_main, btn_reset], spacing=10)
 
     def btn_procesar_clicked(e):
-        pass
+        ruta_imagen = txt_archivo.value
+        if ruta_imagen is None:
+            print("No se pudo leer la imagen para procesar.")
+            return
+        
+        img = cv2.imread(ruta_imagen)
+        # Paso 1: Redimensionar para mejor calidad OCR
+        altura, ancho = img.shape[:2]    
+        
+        # Reducir si es muy grande, aumentar si es muy pequeña
+        if altura > 1500:
+            factor = 1500 / altura
+            nuevo_ancho = int(ancho * factor)
+            img = cv2.resize(img, (nuevo_ancho, 1500), interpolation=cv2.INTER_CUBIC)
+        
+        # Paso 2: Convertir a escala de grises
+        gris = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+        # Paso 3: Mejorar contraste con CLAHE
+        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+        contraste = clahe.apply(gris)
+
+        # Paso 4: Aplicar filtro bilateral para reducir ruido manteniendo bordes
+        filtrado = cv2.bilateralFilter(contraste, 9, 75, 75)
+
+        # Usar filtro bilateral para preservar bordes
+        suavizado = cv2.bilateralFilter(gris, 15, 80, 80)    
+
+        # 4. Umbralización adaptativa MÁS CONSERVADORA
+        umbral = cv2.adaptiveThreshold(
+            suavizado, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY, 21, 8  # Parámetros más conservadores
+        )
+
+        # Solo limpieza mínima
+        kernel = np.ones((1, 1), np.uint8)
+        procesada = cv2.morphologyEx(umbral, cv2.MORPH_OPEN, kernel)
+
+        # Guardar imagen procesada temporalmente
+        output_path = "processed.png"
+        cv2.imwrite(output_path, procesada)
+        img_flet.content.src_base64 = base64.b64encode(cv2.imencode('.png', procesada)[1]).decode('utf-8')                 
+        page.update()
+        print("Imagen procesada guardada en", output_path)
+
 
     def rotar_izquierda(e):
         path = txt_archivo.value

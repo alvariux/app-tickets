@@ -8,7 +8,7 @@ args = vars(ap.parse_args())
 
 
 #with Mistral(
-#    api_key=os.getenv("MISTRAL_API_KEY", "PbDSfdg5DRmxQ4K7ixdf2DgDJcipVhuh"),
+#    api_key=os.getenv("MISTRAL_API_KEY", ""),
 #) as mistral:
 
 #    res = mistral.models.list()
