@@ -1,0 +1,19 @@
+# Motor OCR (0-3)
+oem 3
+
+# Modo de segmentación de página (0-13)
+psm 6
+
+# Caracteres permitidos (whitelist)
+tessedit_char_whitelist 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÉÍÓÚáéíóúÑñ.,$/- kg()#:
+
+# Configuraciones de procesamiento
+textord_old_baselines 0
+textord_really_old_xheight 1
+textord_min_xheight 0.001
+textord_heavy_nr 0
+edges_max_children_per_outline 100
+
+# Configuraciones adicionales recomendadas
+preserve_interword_spaces 1
+textord_noise_rej 0
